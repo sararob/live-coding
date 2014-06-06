@@ -34,8 +34,11 @@
 			console.log(error);
 		}
 		else if (user) {
-			usersRef.child(user.username).child('pic').set(user.thirdPartyUserData.profile_image_url);
-			currentUser = user.username;
+			console.log(user);
+			usersRef.child(user.uid).child('pic').set(user.thirdPartyUserData.profile_image_url);
+			usersRef.child(user.uid).child('username').set(user.username);
+			// usersRef.child(user.username).child('pic').set(user.thirdPartyUserData.profile_image_url);
+			currentUser = user;
 		} else {
 		}
 	});
@@ -53,7 +56,7 @@
 	$('#tweet-submit').on('click', function () {
 		if (currentUser != null) {
 			var message = $('#msgInput').val();
-			messageRef.push({user: currentUser, message: message});
+			messageRef.push({user: currentUser.uid, message: message, username: currentUser.username});
 			$('#msgInput').val('');
 		} else {
 			alert('You must login with Twitter to post!');
