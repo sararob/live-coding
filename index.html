@@ -5,10 +5,10 @@
     <script type='text/javascript' src='https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js'></script>
     <script type='text/javascript'
         src='https://cdn.firebase.com/js/simple-login/1.4.1/firebase-simple-login.js'></script>
-    <link rel="stylesheet" href="main.css"></link>
+    <link rel="stylesheet" href="css/main.css"></link>
 </head>
 <body>
-<a href="#" id="login">Sign in With Twitter</a>
+<a href="#" id="login"><img src="twitter.png"/>Sign in With Twitter</a>
 <h1>Future Insights Stream</h1>
 <div id="stream"></div>
 <input type="text" id="msgInput" placeholder="Your Message..."/>
@@ -35,8 +35,9 @@
 		}
 		else if (user) {
 			console.log(user);
-			usersRef.child(user.uid).child('pic').set(user.thirdPartyUserData.profile_image_url);
-			usersRef.child(user.uid).child('username').set(user.username);
+			usersRef.child(user.uid).set({pic: user.thirdPartyUserData.profile_image_url, username: user.username});
+			// usersRef.child(user.uid).child('pic').set(user.thirdPartyUserData.profile_image_url);
+			// usersRef.child(user.uid).child('username').set(user.username);
 			// usersRef.child(user.username).child('pic').set(user.thirdPartyUserData.profile_image_url);
 			currentUser = user;
 		} else {
@@ -47,8 +48,7 @@
 	usersRef.on('value', function (snapshot) {
 		var users = snapshot.val();
 		for (var user in users) {
-					$('<img/>').attr('src', users[user]['pic']).appendTo($('#here'));
-		$('<div/>').text('@' + user).appendTo($('#here'));
+			$("<div id='user'><img src=" + users[user]['pic'] + "/><span id='username'>@" + users[user]['username'] + "</span></div>").appendTo($('#here'));
 		}
 	});
 
@@ -67,7 +67,7 @@
 	messageRef.on('child_added', function (snapshot) {
 		console.log(snapshot.val());
 		var message = snapshot.val();
-		$('<div/>').text('@' + message.user).attr('class', 'tweetmsg').append(
+		$('<div/>').text('@' + message.username).attr('class', 'tweetmsg').append(
 				$('<div/>').text(message.message)
 				).attr('class', 'msg-text').appendTo($('#stream'));
 

@@ -19,22 +19,43 @@ h1 {
 }
 
 .msg-text {
-	border: 1px solid black;
-	padding: 4px;
+/*	border: 1px solid black;*/
+	padding: 6px;
 	border-radius: 5px;
 	width: 350px;
 	margin: 15px;
 }
 
-#login {
-	float: right;
+.msg-text:hover {
+	background-color: #50b1ff;
+	color: #fff;
+	border: none;
 }
 
-#msgInput input textarea {
+#login {
+	float: right;
+	padding: 0.5em 1em;
+	background-color: lightgrey;
+	border: none;
+	color: black;
+	font-family: 'HelveticaNeue-Light';
+	font-weight: normal;
+	text-decoration: none;
+	border-radius: 5px;
+	font-size: 18px;
+}
+
+#login img {
+	margin-right: 7px;
+	float: left;
+}
+
+#msgInput {
 	padding: 1em;
 	border: 1px solid #ccc;
 	height: 25px;
-	color: blue;
+	font-size: 14px;
+	font-family: 'HelveticaNeue-Light'
 }
 
 #tweet-submit {
@@ -46,4 +67,27 @@ h1 {
 	color: #FFF;
 	font-family: 'HelveticaNeue-Light';
 	font-weight: normal;
+	font-size: 14px;
+}
+
+#tweet-submit:hover {
+	cursor: pointer;
+}
+
+#here {
+	max-width: 650px;
+	margin-left: 15px;
+}
+
+#user {
+	display: inline-block;
+}
+
+#user img {
+	border-radius: 5px;
+}
+
+#username {
+	margin: 15px 0px 0px 10px;
+	float: right;
 }
