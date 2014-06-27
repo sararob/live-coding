@@ -13,13 +13,14 @@ body {
 }
 
 h1 {
-	font-weight: bold;
 	font-family: 'Gotham Bold';
-	font-size: ;
+}
+
+#stream {
+	display: inline-block;
 }
 
 .msg-text {
-/*	border: 1px solid black;*/
 	padding: 6px;
 	border-radius: 5px;
 	width: 350px;
@@ -43,6 +44,11 @@ h1 {
 	text-decoration: none;
 	border-radius: 5px;
 	font-size: 18px;
+	margin: -3px 40px 0px 0px;
+}
+
+#login:hover {
+	background-color: #f0f0f0;
 }
 
 #login img {
@@ -55,7 +61,8 @@ h1 {
 	border: 1px solid #ccc;
 	height: 25px;
 	font-size: 14px;
-	font-family: 'HelveticaNeue-Light'
+	font-family: 'HelveticaNeue-Light';
+	border-radius: 5px;
 }
 
 #tweet-submit {
@@ -68,6 +75,7 @@ h1 {
 	font-family: 'HelveticaNeue-Light';
 	font-weight: normal;
 	font-size: 14px;
+	border-radius: 5px;
 }
 
 #tweet-submit:hover {
@@ -75,12 +83,14 @@ h1 {
 }
 
 #here {
-	max-width: 650px;
+	width: 50%;
 	margin-left: 15px;
+	float: right;
 }
 
 #user {
 	display: inline-block;
+	margin: 10px;
 }
 
 #user img {

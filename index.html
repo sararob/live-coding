@@ -1,6 +1,6 @@
 <html>
 <head>
-    <title>ConfFinder</title>
+    <title>JS.LA Chat</title>
     <script type="text/javascript" src="https://cdn.firebase.com/v0/firebase.js"></script>
     <script type='text/javascript' src='https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js'></script>
     <script type='text/javascript'
@@ -8,68 +8,70 @@
     <link rel="stylesheet" href="css/main.css"></link>
 </head>
 <body>
-<a href="#" id="login"><img src="twitter.png"/>Sign in With Twitter</a>
-<h1>Future Insights Stream</h1>
-<div id="stream"></div>
-<input type="text" id="msgInput" placeholder="Your Message..."/>
+
+
+<div id="stream">
+	<h1>JS.LA Chat</h1>
+	<input type="text" id="msgInput" placeholder="Your Message..."/>
 <button type="submit" id="tweet-submit">Submit</button>
-<h2>Who's here?!</h2>
-<div id="here"></div>
+</div>
+
+<div id="here">
+<h1>Who's here?!<a href="#" id="login"><img src="twitter.png"/>Sign in With Twitter</a></h1>
+</div>
 <script>
 
-	//Define references
+	//STEP 1: Define Firebase references
+	var ref = new Firebase("https://jsla.firebaseio.com/");
+	var usersRef = ref.child("users");
+	var messagesRef = ref.child("messages");
 	var currentUser = null;
-	var ref = new Firebase("https://future-insights.firebaseio.com/");
-	var messageRef = ref.child('messages');
-	var usersRef = ref.child('users');
-	
-	//STEP 1: Log user in when login button is clicked
+
+	//STEP 2: Log user in when login button is clicked
 	$('#login').on("click", function () {
 		auth.login('twitter');
 	});
 
-	//STEP 2: Login with Twitter
+
+	//STEP 3: Login with Twitter
 	var auth = new FirebaseSimpleLogin(ref, function (error, user) {
 		if (error) {
 			console.log(error);
-		}
-		else if (user) {
-			console.log(user);
-			usersRef.child(user.uid).set({pic: user.thirdPartyUserData.profile_image_url, username: user.username});
-			// usersRef.child(user.uid).child('pic').set(user.thirdPartyUserData.profile_image_url);
-			// usersRef.child(user.uid).child('username').set(user.username);
-			// usersRef.child(user.username).child('pic').set(user.thirdPartyUserData.profile_image_url);
+		} else if (user) {
+			usersRef.child(user.uid).set({username: user.username, pic: user.thirdPartyUserData.profile_image_url});
 			currentUser = user;
 		} else {
+			//user is logged out
 		}
 	});
 
-	//STEP 3: Log who's here
-	usersRef.on('value', function (snapshot) {
-		var users = snapshot.val();
-		for (var user in users) {
-			$("<div id='user'><img src=" + users[user]['pic'] + "/><span id='username'>@" + users[user]['username'] + "</span></div>").appendTo($('#here'));
-		}
+
+	//STEP 4: Display a list of users who have logged in
+	usersRef.on("child_added", function (snapshot) {
+		var user = snapshot.val();
+		$("<div id='user'><img src=" + user.pic + "/><span id='username'>@" + user.username + "</span></div>").appendTo($('#here'));
+
 	});
 
-	//STEP 4: Add tweet if logged in 
+
+	//STEP 5: Store messages in Firebase
 	$('#tweet-submit').on('click', function () {
 		if (currentUser != null) {
 			var message = $('#msgInput').val();
-			messageRef.push({user: currentUser.uid, message: message, username: currentUser.username});
+
+			//Send the message to Firebase
+			messagesRef.push({user: currentUser.uid, username: currentUser.username, message: message});
 			$('#msgInput').val('');
 		} else {
 			alert('You must login with Twitter to post!');
 		}
 	});
 
-	//STEP 5: Add new tweet messages in realtime
-	messageRef.on('child_added', function (snapshot) {
-		console.log(snapshot.val());
+
+	//STEP 6: Add messages to DOM in realtime
+	messagesRef.on("child_added", function (snapshot) {
 		var message = snapshot.val();
-		$('<div/>').text('@' + message.username).attr('class', 'tweetmsg').append(
-				$('<div/>').text(message.message)
-				).attr('class', 'msg-text').appendTo($('#stream'));
+		$("<div class='msg-text'>@" + message.username + "<br/>" + message.message + "</div>").appendTo($('#stream'));
 
 	});
 
