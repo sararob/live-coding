@@ -70,10 +70,22 @@
 
 	//STEP 6: Add messages to DOM in realtime
 	messagesRef.on("child_added", function (snapshot) {
-	var message = snapshot.val();
-	$("<div class='msg-text'>@" + message.username + "<br/>" + message.message + "</div>").appendTo($('#stream'));
+	  var message = snapshot.val(),
+        safeMessage;
 
+    safeMessage =
+      $("<div class='msg-text'>@" +
+        stripTags(message.username) +
+        "<br/>" +
+        stripTags(message.message) +
+        "</div>");
+
+    $('#stream').append(safeMessage);
 	});
+
+  function stripTags(str) {
+    return str.replace(/(<([^>]+)>)/ig,"");
+  }
 
 </script>
 </body>
