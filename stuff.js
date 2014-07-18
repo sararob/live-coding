@@ -1,8 +1,9 @@
 //STEP 1
-var currentUser = null;
-var ref = new Firebase("https://jsla.firebaseio.com/");
+
+var ref = new Firebase("https://rethinkdb.firebaseio.com/");
 var messageRef = ref.child('messages');
 var usersRef = ref.child('users');
+var currentUser = null;
 
 //STEP 2
 	$('#login').on("click", function () {
