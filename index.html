@@ -1,7 +1,7 @@
 <html>
 <head>
-    <title>RethinkDB + Firebase Chat</title>
-    <script type="text/javascript" src="https://cdn.firebase.com/v0/firebase.js"></script>
+    <title>Firebase Chat Example</title>
+    <script src="https://cdn.firebase.com/js/client/2.0.2/firebase.js"></script>
     <script type='text/javascript' src='https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js'></script>
     <script type='text/javascript'
         src='https://cdn.firebase.com/js/simple-login/1.4.1/firebase-simple-login.js'></script>
@@ -10,7 +10,7 @@
 <body>
 
 <div id="stream">
-	<h1>RethinkDB + Firebase Chat</h1>
+	<h1>Firebase Chat</h1>
 	<input type="text" id="msgInput" placeholder="Your Message..."/>
 <button type="submit" id="tweet-submit">Submit</button>
 </div>
@@ -20,56 +20,58 @@
 </div>
 <script>
 
-	//STEP 1: Define Firebase references
-	var ref = new Firebase("https://rethinkdb.firebaseio.com/");
-	var usersRef = ref.child("users");
-	var messagesRef = ref.child("messages");
-	var currentUser = null;
+//STEP 1
 
-	//STEP 2: Log user in when login button is clicked
+var ref = new Firebase("https://<YOUR-FIREBASE-NAME>.firebaseio.com/");
+var messagesRef = ref.child('messages');
+var usersRef = ref.child('users');
+var currentUser = null;
+
+//STEP 2
 	$('#login').on("click", function () {
-		auth.login('twitter');
+		authenticate();
 	});
 
-	//STEP 3: Login with Twitter
-	var auth = new FirebaseSimpleLogin(ref, function (error, user) {
+//STEP 3
+var authenticate = function() {
+	usersRef.authWithOAuthPopup('twitter', function (error, user) {
 		if (error) {
 			console.log(error);
 		} else if (user) {
-			usersRef.child(user.uid).set({username: user.username, pic: user.thirdPartyUserData.profile_image_url});
+			usersRef.child(user.uid).set({username: user.twitter.username, pic: user.twitter.cachedUserProfile.profile_image_url_https});
 			currentUser = user;
-		} else {
-			//user is logged out
 		}
 	});
-
-
-	//STEP 4: Display a list of users who have logged in
-	usersRef.on("child_added", function (snapshot) {
-var user = snapshot.val();
-	$("<div id='user'><img src=" + user.pic + "/><span id='username'>@" + user.username + "</span></div>").appendTo($('#here'));
-
+};
+	//Save user's auth state
+	usersRef.onAuth(function (user) {
+		currentUser = user;
 	});
 
+//STEP 4: Display a list of users who have logged in
+usersRef.on('child_added', function (snapshot) {
+  var user = snapshot.val();
+  $("<div id='user'><img src=" + user.pic + "/><span id='username'>@" + user.username + "</span></div>").appendTo($('#here'));
+});
 
-	//STEP 5: Store messages in Firebase
-	$('#tweet-submit').on('click', function () {
-		if (currentUser != null) {
-			var message = $('#msgInput').val();
+//STEP 5: Store messages in Firebase
+$('#tweet-submit').on('click', function () {
+  if (currentUser !== null) {
+    var message = $('#msgInput').val();
+    //Send the message to Firebase
+    messagesRef.push({user: currentUser.uid, username: currentUser.twitter.username, message: message});
+    $('#msgInput').val('');
+  } else {
+    alert('You must login with Twitter to post!');
+  }
+});
 
-			//Send the message to Firebase
-			messagesRef.push({user: currentUser.uid, username: currentUser.username, message: message});
-			$('#msgInput').val('');
-		} else {
-			alert('You must login with Twitter to post!');
-		}
-	});
+//STEP 6: Add messages to DOM in realtime
+messagesRef.on('child_added', function (snapshot) {
+  var message = snapshot.val();
+    $('#stream').append($("<div class='msg-text'>").text(message.username).append('<br/>').append($('<span/>').text(message.message)));
+});
 
-
-	//STEP 6: Add messages to DOM in realtime
-	messagesRef.on("child_added", function (snapshot) {
-var message = snapshot.val();
-	$('#stream').append($("<div class='msg-text'>").text(message.username).append('<br/>').append($('<span/>').text(message.message)));
 
 </script>
 </body>
