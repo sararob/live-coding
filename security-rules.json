@@ -1,0 +1,16 @@
+{
+    "rules": {
+        ".read": true,
+        "messages": {
+          "$message": {
+            ".write": "auth.uid != null && auth.uid === newData.child('user').val()",
+            ".validate": "newData.child('message').val() != ''"
+          }
+        },
+        "users": {
+          "$user": {
+            ".write": "auth.uid === $user"
+          }
+        }
+    }
+}
