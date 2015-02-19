@@ -10,7 +10,8 @@
 <div id="stream">
 	<h1>Firebase Chat</h1>
 	<input type="text" id="msgInput" placeholder="Your Message..."/>
-<button type="submit" id="tweet-submit">Submit</button>
+    <button type="submit" id="tweet-submit">Submit</button>
+    <div id="msg-box"></div>
 </div>
 
 <div id="here">
@@ -19,8 +20,7 @@
 <script>
 
 //STEP 1
-
-var ref = new Firebase("https://<YOUR-FIREBASE-NAME>.firebaseio.com/");
+var ref = new Firebase("https://<YOUR-FIREASE-NAME>.firebaseio.com/");
 var messagesRef = ref.child('messages');
 var usersRef = ref.child('users');
 var currentUser = null;
@@ -37,7 +37,6 @@ var authenticate = function() {
 			console.log(error);
 		} else if (user) {
 			usersRef.child(user.uid).set({username: user.twitter.username, pic: user.twitter.cachedUserProfile.profile_image_url_https});
-			currentUser = user;
 		}
 	});
 };
@@ -57,7 +56,7 @@ $('#tweet-submit').on('click', function () {
   if (currentUser !== null) {
     var message = $('#msgInput').val();
     //Send the message to Firebase
-    messagesRef.push({user: currentUser.uid, username: currentUser.twitter.username, message: message});
+    messagesRef.push({user: currentUser.uid, username: currentUser.twitter.username, message: message, published: new Date().getTime()});
     $('#msgInput').val('');
   } else {
     alert('You must login with Twitter to post!');
@@ -65,9 +64,9 @@ $('#tweet-submit').on('click', function () {
 });
 
 //STEP 6: Add messages to DOM in realtime
-messagesRef.on('child_added', function (snapshot) {
+messagesRef.orderByChild("published").on('child_added', function (snapshot) {
   var message = snapshot.val();
-    $('#stream').append($("<div class='msg-text'>").text(message.username).append('<br/>').append($('<span/>').text(message.message)));
+    $('#msg-box').prepend($("<div class='msg-text'>").text(message.username).append('<br/>').append($('<span/>').text(message.message)));
 });
 
 
